@@ -48,7 +48,7 @@
         L.geoJson(json_ADMINISTRASIKECAMATAN_AR_1, {
             style: function(feature) {
                 // Memberikan warna unik berdasarkan nama kecamatan
-                var namaKec = feature.properties.Kecamatan; // Pastikan nama kolomnya benar ("Kecamatan" atau "name")
+               var namaKec = feature.properties.NAMOBJ;
                 var warna = (namaKec === "Denpasar Barat") ? "#FF5733" : 
                             (namaKec === "Denpasar Selatan") ? "#33FF57" : 
                             (namaKec === "Denpasar Timur") ? "#3357FF" : 
@@ -60,7 +60,7 @@
                 var label = L.marker(layer.getBounds().getCenter(), {
                     icon: L.divIcon({
                         className: 'label-class',
-                        html: '<b>' + feature.properties.Kecamatan + '</b>',
+                       html: '<b>' + feature.properties.NAMOBJ + '</b>',
                         iconSize: [100, 40]
                     })
                 }).addTo(map);
