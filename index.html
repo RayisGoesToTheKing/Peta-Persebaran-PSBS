@@ -1,89 +1,57 @@
 <!doctype html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Peta Persebaran PSBS</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
-        #map { width: 100%; height: 100vh; }
-        .info-container {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 20vh;
-            background: white; z-index: 1000; padding: 20px; box-sizing: border-box;
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.3); overflow-y: auto; transition: height 0.3s; text-align: center;
-        }
-        .info-container.expanded { height: 80vh; }
-        .drag-handle { width: 50px; height: 6px; background: #ccc; border-radius: 5px; margin: 0 auto 20px auto; cursor: pointer; }
-        img { width: 100%; max-width: 600px; height: auto; display: block; margin: 0 auto; }
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <style>
+            html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+            #map { width: 100%; height: 100vh; }
+            .info-container {
+                position: fixed; bottom: 0; left: 0; width: 100%; height: 20vh;
+                background: white; z-index: 1000; border-radius: 20px 20px 0 0;
+                box-shadow: 0 -5px 15px rgba(0,0,0,0.3); overflow-y: auto;
+                transition: height 0.3s ease; padding: 20px; box-sizing: border-box; text-align: center;
+            }
+            .info-container.expanded { height: 80vh; }
+            .drag-handle { width: 50px; height: 6px; background: #ccc; border-radius: 5px; margin: 0 auto 10px auto; cursor: pointer; }
+            img { width: 100%; max-width: 600px; height: auto; }
+        </style>
+        <title>Peta Persebaran PSBS</title>
+    </head>
+    <body>
+        <div id="map"></div>
+
+        <div class="info-container" id="infoBox" onclick="this.classList.toggle('expanded')">
+            <div class="drag-handle"></div>
+            <h1>Keterangan Peta</h1>
+            <img src="Peta Persebaran TPS3R & TPST.jpeg" alt="Legenda">
+            <p>Data TPS3R dan TPST Denpasar.</p>
+        </div>
+
+        <script src="js/leaflet.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="data/ADMINISTRASIKECAMATAN_AR_1.js"></script>
+        <script src="data/DataPersebaranNew_2.js"></script>
+        <script src="js/labels.js"></script>
         
-        /* TAMBAHKAN INI AGAR LABEL NAMA DAERAH MUNCUL */
-        .label-class {
-            color: #000;
-            font-size: 14px;
-            font-weight: bold;
-            text-align: center;
-            text-shadow: 1px 1px 2px #FFF, -1px -1px 2px #FFF;
-        }
-    </style>
-<body>
+        <script>
+            // Inisialisasi Peta (Kode asli QGIS)
+            var map = L.map('map', { zoomControl:true }).fitBounds([[-8.77,115.06],[-8.61,115.35]]);
+            
+            // Layer Peta Dasar
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
 
-    <div id="map"></div>
-    <div class="info-container" id="infoBox" onclick="this.classList.toggle('expanded')">
-        <div class="drag-handle"></div>
-        <h1>Keterangan Peta</h1>
-        <img src="Peta Persebaran TPS3R & TPST.jpeg" alt="Legenda">
-        <p>Data TPS3R dan TPST Denpasar.</p>
-    </div>
+            // Layer Wilayah (Menggunakan style dari QGIS)
+            function style_ADMIN_0() { return { color: '#333', weight: 2, fillColor: '#ccc', fillOpacity: 0.5 }; }
+            L.geoJson(json_ADMINISTRASIKECAMATAN_AR_1, { style: style_ADMIN_0 }).addTo(map);
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="data/ADMINISTRASIKECAMATAN_AR_1.js"></script>
-    <script src="data/DataPersebaranNew_2.js"></script>
-
-    <script>
-        var map = L.map('map').setView([-8.65, 115.22], 12);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
-
-       // Menampilkan Layer Wilayah dengan warna berbeda dan label
-        L.geoJson(json_ADMINISTRASIKECAMATAN_AR_1, {
-            style: function(feature) {
-                // Memberikan warna unik berdasarkan nama kecamatan
-               var namaKec = feature.properties.NAMOBJ;
-                var warna = (namaKec === "Denpasar Barat") ? "#FF5733" : 
-                            (namaKec === "Denpasar Selatan") ? "#33FF57" : 
-                            (namaKec === "Denpasar Timur") ? "#3357FF" : 
-                            (namaKec === "Denpasar Utara") ? "#F1C40F" : "#9B59B6";
-                return { color: "#FFF", weight: 1.5, fillColor: warna, fillOpacity: 0.6 };
-            },
-            onEachFeature: function(feature, layer) {
-                // Menambahkan Label Nama Daerah
-                var label = L.marker(layer.getBounds().getCenter(), {
-                    icon: L.divIcon({
-                        className: 'label-class',
-                       html: '<b>' + feature.properties.NAMOBJ + '</b>',
-                        iconSize: [100, 40]
-                    })
-                }).addTo(map);
-            }
-        }).addTo(map);
-
-        // Menampilkan Layer Titik
-        L.geoJson(json_DataPersebaranNew_2, {
-            pointToLayer: function (feature, latlng) {
-                if (feature.geometry) {
-                    var color = (feature.properties.Jenis === "TPS3R") ? "blue" : "red";
-                    return L.circleMarker(latlng, { radius: 6, fillColor: color, color: "#000", fillOpacity: 0.8 });
-                }
-            },
-            onEachFeature: function (feature, layer) {
-                if (feature.properties && feature.properties.Nama) {
-                    var popup = "<b>" + feature.properties.Nama + "</b><br>" + 
-                                "Jenis: " + (feature.properties.Jenis || "-") + "<br>" +
-                                "<a href='" + feature.properties.Link_Gmaps + "' target='_blank'>Buka di Google Maps</a>";
-                    layer.bindPopup(popup);
-                }
-            }
-        }).addTo(map);
-    </script>
-</body>
+            // Layer Titik
+            L.geoJson(json_DataPersebaranNew_2, {
+                pointToLayer: function(f, latlng) { return L.circleMarker(latlng, { radius: 6, fillColor: 'red', color: '#000' }); },
+                onEachFeature: function(f, layer) { layer.bindPopup("<b>" + f.properties.Nama + "</b>"); }
+            }).addTo(map);
+        </script>
+    </body>
 </html>
