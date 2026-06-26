@@ -288,17 +288,15 @@ body{
 
 <script>
 
-<script>
-
-// =====================
+// =========================
 // BOTTOM SHEET
-// =====================
+// =========================
 const sheet = document.getElementById('sheet');
 
 sheet.addEventListener('click', function(e){
 
     if(
-        e.target===sheet ||
+        e.target === sheet ||
         e.target.classList.contains('drag-handle') ||
         e.target.classList.contains('drag-text')
     ){
@@ -308,15 +306,15 @@ sheet.addEventListener('click', function(e){
 });
 
 
-// =====================
+// =========================
 // MAP
-// =====================
+// =========================
 var map = L.map('map').setView([-8.65,115.22],12);
 
 
-// =====================
+// =========================
 // BASEMAP
-// =====================
+// =========================
 L.tileLayer(
     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     {
@@ -325,71 +323,9 @@ L.tileLayer(
 ).addTo(map);
 
 
-// =====================
-// TOMBOL LOKASI
-// =====================
-var locate = L.control({
-    position:'topleft'
-});
-
-locate.onAdd = function(){
-
-    var div = L.DomUtil.create('div');
-
-    div.innerHTML =
-    '<button class="locate-btn" id="locateBtn">📍 Lokasi Saya</button>';
-
-    return div;
-};
-
-locate.addTo(map);
-
-
-// =====================
-// GPS
-// =====================
-document.addEventListener('click',function(e){
-
-    if(e.target.id==="locateBtn"){
-
-        map.locate({
-            setView:true,
-            maxZoom:16
-        });
-
-    }
-
-});
-
-map.on('locationfound',function(e){
-
-    L.circle(
-        e.latlng,
-        {
-            radius:50,
-            color:'blue',
-            fillColor:'blue',
-            fillOpacity:0.2
-        }
-    ).addTo(map);
-
-    L.marker(e.latlng)
-        .addTo(map)
-        .bindPopup("📍 Lokasi Anda")
-        .openPopup();
-
-});
-
-map.on('locationerror',function(){
-
-    alert("GPS tidak dapat diakses.");
-
-});
-
-
-// =====================
+// =========================
 // LAYER WILAYAH
-// =====================
+// =========================
 L.geoJson(
     json_ADMINISTRASIKECAMATAN_AR_1,
     {
@@ -432,6 +368,7 @@ L.geoJson(
 
             return{
                 color:"#000",
+                weight:2,
                 fillOpacity:0
             };
         }
@@ -439,97 +376,9 @@ L.geoJson(
 ).addTo(map);
 
 
-// =====================
-// LAYER TITIK
-// =====================
-var titikLayer = L.geoJson(
-    json_DataPersebaranNew_2,
-    {
-
-        // abaikan data rusak
-        filter:function(feature){
-
-            return (
-                feature &&
-                feature.geometry &&
-                feature.geometry.type==="Point"
-            );
-
-        },
-
-        pointToLayer:function(feature,latlng){
-
-            var color =
-            feature.properties.Jenis==="TPS3R"
-            ? "rgba(13,0,229,1)"
-            : "rgba(226,11,0,1)";
-
-            return L.circleMarker(
-                latlng,
-                {
-                    radius:6,
-                    fillColor:color,
-                    color:"#000",
-                    weight:1,
-                    fillOpacity:0.8
-                }
-            );
-
-        },
-
-        onEachFeature:function(feature,layer){
-
-            var nama =
-                feature.properties.Nama || "-";
-
-            var jenis =
-                feature.properties.Jenis || "-";
-
-            var lat =
-                feature.properties.Latitude || "-";
-
-            var lon =
-                feature.properties.Longitude || "-";
-
-            var link =
-                feature.properties.Link_Gmaps;
-
-            var popup =
-            '<div style="min-width:220px;">'+
-            '<h3>'+nama+'</h3>'+
-            '<hr>'+
-            '<b>♻ Jenis:</b><br>'+jenis+
-            '<br><br>'+
-            '<b>📍 Koordinat:</b><br>'+
-            lat+', '+lon+
-            '<br><br>';
-
-            if(link){
-
-                popup +=
-                '<a href="'+link+
-                '" target="_blank">🗺 Buka Google Maps</a>';
-
-            }else{
-
-                popup +=
-                '<i>Link tidak tersedia</i>';
-
-            }
-
-            popup += '</div>';
-
-            layer.bindPopup(popup);
-
-        }
-
-    }
-).addTo(map);
-
-
-// =====================
-// STATISTIK
-// =====================
+// =========================
+// HITUNG STATISTIK
+// =========================
 var totalTPS3R = 0;
 var totalTPST = 0;
 
@@ -548,23 +397,107 @@ json_DataPersebaranNew_2.features.forEach(function(f){
 
     if(f.properties.Jenis==="TPST")
         totalTPST++;
-
 });
 
-document.getElementById(
-    'statistik'
-).innerHTML =
 
-'<li><b>Total TPS3R :</b> '+
-totalTPS3R+
-'</li><br>'+
+// tampilkan statistik
+var statistik = document.getElementById('statistik');
 
-'<li><b>Total TPST :</b> '+
-totalTPST+
-'</li><br>'+
+if(statistik){
 
-'<li><b>Total Keseluruhan :</b> '+
-(totalTPS3R+totalTPST)+
-'</li>';
+    statistik.innerHTML =
+
+        '<li><b>Total TPS3R :</b> '
+        + totalTPS3R +
+        '</li><br>' +
+
+        '<li><b>Total TPST :</b> '
+        + totalTPST +
+        '</li><br>' +
+
+        '<li><b>Total Keseluruhan :</b> '
+        + (totalTPS3R+totalTPST) +
+        '</li>';
+}
+
+
+// =========================
+// LAYER TITIK
+// =========================
+L.geoJson(
+    json_DataPersebaranNew_2,
+    {
+
+        filter:function(feature){
+
+            return(
+                feature &&
+                feature.geometry &&
+                feature.geometry.type==="Point" &&
+                feature.properties &&
+                feature.properties.Jenis
+            );
+        },
+
+        pointToLayer:function(feature,latlng){
+
+            var color =
+                feature.properties.Jenis==="TPS3R"
+                ? "rgba(13,0,229,1)"
+                : "rgba(226,11,0,1)";
+
+            return L.circleMarker(
+                latlng,
+                {
+                    radius:7,
+                    fillColor:color,
+                    color:"#000",
+                    weight:1,
+                    fillOpacity:0.85
+                }
+            );
+        },
+
+        onEachFeature:function(feature,layer){
+
+            var popup =
+
+                '<div style="min-width:220px;">'+
+
+                '<h3 style="margin-bottom:8px;">'+
+                (feature.properties.Nama||'-')+
+                '</h3>'+
+
+                '<hr>'+
+
+                '<b>♻ Jenis:</b><br>'+
+                (feature.properties.Jenis||'-')+
+
+                '<br><br>'+
+
+                '<b>📍 Koordinat:</b><br>'+
+                feature.properties.Latitude+
+                ', '+
+                feature.properties.Longitude+
+
+                '<br><br>';
+
+            if(feature.properties.Link_Gmaps){
+
+                popup +=
+                    '<a href="'+
+                    feature.properties.Link_Gmaps+
+                    '" target="_blank">'+
+                    '🗺 Buka Google Maps'+
+                    '</a>';
+            }
+
+            popup += '</div>';
+
+            layer.bindPopup(popup);
+        }
+
+    }
+).addTo(map);
 
 </script>
