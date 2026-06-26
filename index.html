@@ -424,8 +424,52 @@ if(statistik){
 // =========================
 // LAYER TITIK
 // =========================
+if(typeof json_DataPersebaranNew_2 !== 'undefined'){
+
 L.geoJson(
     json_DataPersebaranNew_2,
+    {
+        filter:function(feature){
+            return feature &&
+                   feature.geometry &&
+                   feature.geometry.type==="Point";
+        },
+
+        pointToLayer:function(feature,latlng){
+
+            var color =
+                feature.properties.Jenis==="TPS3R"
+                ? "#0000ff"
+                : "#ff0000";
+
+            return L.circleMarker(latlng,{
+                radius:7,
+                fillColor:color,
+                color:"#000",
+                weight:1,
+                fillOpacity:0.85
+            });
+        },
+
+        onEachFeature:function(feature,layer){
+
+            var popup =
+                "<b>"+(feature.properties.Nama||"-")+"</b><br>"+
+                "Jenis: "+(feature.properties.Jenis||"-")+"<br>";
+
+            if(feature.properties.Link_Gmaps){
+                popup +=
+                "<a target='_blank' href='"+
+                feature.properties.Link_Gmaps.trim()+
+                "'>Buka Google Maps</a>";
+            }
+
+            layer.bindPopup(popup);
+        }
+    }
+).addTo(map);
+
+}
     {
 
         filter:function(feature){
