@@ -1,44 +1,36 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="css/leaflet.css">
-        <link rel="stylesheet" href="css/qgis2web.css">
-        <style>
-            body, html { margin: 0; padding: 0; height: 100%; }
-            #map { width: 100%; height: 100vh; }
-            
-            /* CSS untuk Keterangan Scrollable */
-            .info-container {
-                position: fixed; bottom: 0; left: 0; width: 100%; height: 25%;
-                background: white; z-index: 9999; padding: 15px;
-                box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
-                overflow-y: auto; transition: height 0.3s;
+// 1. Menambahkan Layer Wilayah (Warna & Judul)
+        L.geoJson(json_ADMINISTRASIKECAMATAN_AR_1, {
+            style: function(feature) {
+                // Kamu bisa memanggil fungsi style asli dari QGIS di sini
+                // atau mendefinisikan warna manual berdasarkan nama kecamatan
+                return {
+                    color: '#323232', 
+                    weight: 2, 
+                    fillOpacity: 0.6,
+                    fillColor: (feature.properties.NAMOBJ === 'Denpasar Barat') ? '#7bff00' : 
+                               (feature.properties.NAMOBJ === 'Denpasar Selatan') ? '#00e3ae' :
+                               (feature.properties.NAMOBJ === 'Denpasar Timur') ? '#700cd9' : '#d57a00'
+                };
+            },
+            onEachFeature: function(feature, layer) {
+                // 2. Menambahkan Label Nama Daerah
+                if (feature.properties && feature.properties.NAMOBJ) {
+                    layer.bindTooltip(feature.properties.NAMOBJ, {
+                        permanent: true, 
+                        direction: 'center', 
+                        className: 'label-style'
+                    });
+                }
             }
-            .info-container.expanded { height: 80%; }
-        </style>
-    </head>
-    <body>
-        <div id="map"></div>
-        
-        <div class="info-container" onclick="this.classList.toggle('expanded')">
-            <h3 style="text-align:center;">Klik untuk melihat keterangan</h3>
-            <img src="Peta Persebaran TPS3R & TPST.jpeg" style="width:100%;">
-            <p>Data TPS3R dan TPST Denpasar.</p>
-        </div>
+        }).addTo(map);
 
-        <script src="js/leaflet.js"></script>
-        <script src="data/ADMINISTRASIKECAMATAN_AR_1.js"></script>
-        <script src="data/DataPersebaranNew_2.js"></script>
-        <script>
-            var map = L.map('map').setView([-8.65, 115.22], 12);
-            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-            
-            // Layer Wilayah (memanggil fungsi style dari QGIS)
-            L.geoJson(json_ADMINISTRASIKECAMATAN_AR_1, {
-                style: style_ADMINISTRASIKECAMATAN_AR_1_0
-            }).addTo(map);
-        </script>
-    </body>
-</html>
+        // Tambahkan CSS ini di antara tag <style> agar label terlihat bagus
+        /* .label-style {
+            background: none !important;
+            border: none !important;
+            box-shadow: none !important;
+            font-weight: bold;
+            color: #333;
+            font-size: 14px;
+        } 
+        */
