@@ -242,16 +242,57 @@ L.tileLayer(
 }).addTo(map);
 
 // Layer wilayah
-L.geoJson(
-    json_ADMINISTRASIKECAMATAN_AR_1,
-    {
-        style:{
-            color:"#333",
-            weight:2,
-            fillOpacity:0.2
+L.geoJson(json_ADMINISTRASIKECAMATAN_AR_1, {
+
+    style:function(feature){
+
+        switch(String(feature.properties.NAMOBJ)){
+
+            case "Denpasar Barat":
+                return {
+                    color:"#000000",
+                    weight:3,
+                    opacity:1,
+                    fillColor:"rgba(123,255,0,0.62)",
+                    fillOpacity:0.62
+                };
+
+            case "Denpasar Selatan":
+                return {
+                    color:"#000000",
+                    weight:3,
+                    opacity:1,
+                    fillColor:"rgba(0,227,174,0.51)",
+                    fillOpacity:0.51
+                };
+
+            case "Denpasar Timur":
+                return {
+                    color:"#000000",
+                    weight:3,
+                    opacity:1,
+                    fillColor:"rgba(112,12,217,0.57)",
+                    fillOpacity:0.57
+                };
+
+            case "Denpasar Utara":
+                return {
+                    color:"#000000",
+                    weight:3,
+                    opacity:1,
+                    fillColor:"rgba(213,122,0,0.67)",
+                    fillOpacity:0.67
+                };
         }
+
+        return {
+            color:"#000",
+            weight:2,
+            fillOpacity:0
+        };
     }
-).addTo(map);
+
+}).addTo(map);
 
 // Layer titik
 L.geoJson(
@@ -261,10 +302,10 @@ L.geoJson(
 
             if(feature.geometry){
 
-                var color =
-                    feature.properties.Jenis==="TPS3R"
-                    ? "blue"
-                    : "red";
+            var color =
+feature.properties.Jenis==="TPS3R"
+? "rgba(13,0,229,1)"
+: "rgba(226,11,0,1)";
 
                 return L.circleMarker(
                     latlng,
