@@ -16,34 +16,67 @@
         margin: 0;
         padding: 0;
         height: 100%;
-        overflow-x: hidden; /* Mencegah layar bergeser ke samping */
+        overflow: hidden; /* Mengunci halaman agar tidak scroll asal */
     }
     #map {
         width: 100%;
-        height: 80vh; /* Peta mengambil 80% tinggi layar, sisanya konten */
+        height: 100vh; /* Peta memenuhi seluruh layar */
+        position: absolute;
+        top: 0;
         z-index: 1;
-        /* Hapus baris 'position: sticky' dan 'top: 0' agar peta bisa ikut scroll */
     }
     .info-container {
-        padding: 40px 20px;
-        background-color: white;
-        z-index: 2;
-        min-height: 100vh;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 30vh; /* Tinggi awal panel */
+        background: white;
+        z-index: 1000;
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -5px 15px rgba(0,0,0,0.2);
+        overflow-y: auto; /* Memungkinkan konten di dalam di-scroll */
+        transition: height 0.3s ease; /* Efek transisi halus */
+        padding: 20px;
+        box-sizing: border-box;
         text-align: center;
-        box-shadow: 0 -5px 15px rgba(0,0,0,0.1); /* Efek agar terlihat seperti lembaran kertas di atas peta */
+    }
+    .info-container.expanded {
+        height: 90vh; /* Tinggi saat ditarik ke atas */
+    }
+    .drag-handle {
+        width: 50px;
+        height: 6px;
+        background: #ccc;
+        border-radius: 5px;
+        margin: 0 auto 20px auto;
+        cursor: pointer;
     }
     .info-container img {
         width: 100%; 
-        max-width: 800px; /* Membatasi lebar agar foto tidak kepanjangan di layar PC */
-        height: auto;     /* Penting: menjaga proporsi gambar agar tidak terpotong */
-        margin: 20px 0;
+        max-width: 800px;
+        height: auto;
         display: block;
-        margin-left: auto;
-        margin-right: auto;
+        margin: 0 auto;
     }
 </style>
-</style>
-        <title></title>
+        max-width: 800px; /* Membatasi lebar agar foto tidak kepanjangan di layar PC */
+        height: auto;     /* Penting: menjaga proporsi gambar agar tidak terpotong */
+<body>
+    <div id="map"></div>
+
+    <div class="info-container" id="infoBox">
+        <div class="drag-handle" onclick="toggleInfo()"></div>
+        <h1>Keterangan Peta</h1>
+        <img src="Peta Persebaran TPS3R & TPST.jpeg" alt="Legenda Peta">
+        <p>Tuliskan keterangan detail tentang data TPS3R dan TPST di sini.</p>
+    </div>
+
+    <script>
+        function toggleInfo() {
+            document.getElementById('infoBox').classList.toggle('expanded');
+        }
+    </script>
     </head>
    <body>
     <div id="map"></div>
