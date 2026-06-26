@@ -11,19 +11,37 @@
         <link rel="stylesheet" href="css/qgis2web.css">
         <link rel="stylesheet" href="css/fontawesome-all.min.css">
         <link rel="stylesheet" href="css/leaflet.photon.css">
-        <style>
-        html, body, #map {
-            width: 100%;
-            height: 100%;
-            padding: 0;
-            margin: 0;
-        }
-        </style>
+       <style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+    }
+    #map {
+        width: 100%;
+        height: 60vh; /* Peta mengambil 60% tinggi layar */
+        position: sticky; /* Kunci peta agar tetap terlihat saat scroll */
+        top: 0;
+        z-index: 1;
+    }
+    .info-container {
+        padding: 20px;
+        background-color: white;
+        position: relative;
+        z-index: 2; /* Memastikan konten muncul di atas peta */
+        min-height: 100vh;
+    }
+</style>
         <title></title>
     </head>
-    <body>
-        <div id="map">
-        </div>
+   <body>
+    <div id="map"></div>
+
+    <div class="info-container">
+        <h1>Keterangan Peta</h1>
+        <img src="Peta Persebaran TPS3R & TPST.jpeg" alt="Legenda Peta" style="width:100%;">
+        <p>Tuliskan keterangan detail tentang data TPS3R dan TPST di sini.</p>
+    </div>
         <script src="js/qgis2web_expressions.js"></script>
         <script src="js/leaflet.js"></script>
         <script src="js/L.Control.Layers.Tree.min.js"></script>
