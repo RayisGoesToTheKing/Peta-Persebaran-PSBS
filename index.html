@@ -288,10 +288,14 @@ body{
 
 <script>
 
-// BOTTOM SHEET
-const sheet=document.getElementById('sheet');
+<script>
 
-sheet.addEventListener('click',function(e){
+// =====================
+// BOTTOM SHEET
+// =====================
+const sheet = document.getElementById('sheet');
+
+sheet.addEventListener('click', function(e){
 
     if(
         e.target===sheet ||
@@ -303,18 +307,36 @@ sheet.addEventListener('click',function(e){
 
 });
 
+
+// =====================
 // MAP
-var map=L.map('map').setView([-8.65,115.22],12);
-    // TOMBOL LOKASI
-var locate=L.control({
+// =====================
+var map = L.map('map').setView([-8.65,115.22],12);
+
+
+// =====================
+// BASEMAP
+// =====================
+L.tileLayer(
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {
+        attribution:'© OpenStreetMap'
+    }
+).addTo(map);
+
+
+// =====================
+// TOMBOL LOKASI
+// =====================
+var locate = L.control({
     position:'topleft'
 });
 
-locate.onAdd=function(){
+locate.onAdd = function(){
 
-    var div=L.DomUtil.create('div');
+    var div = L.DomUtil.create('div');
 
-    div.innerHTML=
+    div.innerHTML =
     '<button class="locate-btn" id="locateBtn">📍 Lokasi Saya</button>';
 
     return div;
@@ -322,14 +344,10 @@ locate.onAdd=function(){
 
 locate.addTo(map);
 
-// BASEMAP
-L.tileLayer(
-'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-{
-    attribution:'© OpenStreetMap'
-}).addTo(map);
 
-// GPS BUTTON
+// =====================
+// GPS
+// =====================
 document.addEventListener('click',function(e){
 
     if(e.target.id==="locateBtn"){
@@ -356,9 +374,9 @@ map.on('locationfound',function(e){
     ).addTo(map);
 
     L.marker(e.latlng)
-    .addTo(map)
-    .bindPopup("📍 Lokasi Anda")
-    .openPopup();
+        .addTo(map)
+        .bindPopup("📍 Lokasi Anda")
+        .openPopup();
 
 });
 
@@ -367,125 +385,163 @@ map.on('locationerror',function(){
     alert("GPS tidak dapat diakses.");
 
 });
+
+
+// =====================
 // LAYER WILAYAH
+// =====================
 L.geoJson(
-json_ADMINISTRASIKECAMATAN_AR_1,
-{
-    style:function(feature){
+    json_ADMINISTRASIKECAMATAN_AR_1,
+    {
+        style:function(feature){
 
-        switch(String(feature.properties.NAMOBJ)){
+            switch(String(feature.properties.NAMOBJ)){
 
-            case "Denpasar Barat":
-                return{
-                    color:"#000",
-                    weight:3,
-                    fillColor:"rgba(123,255,0,0.62)",
-                    fillOpacity:0.62
-                };
+                case "Denpasar Barat":
+                    return{
+                        color:"#000",
+                        weight:3,
+                        fillColor:"rgba(123,255,0,0.62)",
+                        fillOpacity:0.62
+                    };
 
-            case "Denpasar Selatan":
-                return{
-                    color:"#000",
-                    weight:3,
-                    fillColor:"rgba(0,227,174,0.51)",
-                    fillOpacity:0.51
-                };
+                case "Denpasar Selatan":
+                    return{
+                        color:"#000",
+                        weight:3,
+                        fillColor:"rgba(0,227,174,0.51)",
+                        fillOpacity:0.51
+                    };
 
-            case "Denpasar Timur":
-                return{
-                    color:"#000",
-                    weight:3,
-                    fillColor:"rgba(112,12,217,0.57)",
-                    fillOpacity:0.57
-                };
+                case "Denpasar Timur":
+                    return{
+                        color:"#000",
+                        weight:3,
+                        fillColor:"rgba(112,12,217,0.57)",
+                        fillOpacity:0.57
+                    };
 
-            case "Denpasar Utara":
-                return{
-                    color:"#000",
-                    weight:3,
-                    fillColor:"rgba(213,122,0,0.67)",
-                    fillOpacity:0.67
-                };
-        }
-
-        return{
-            color:"#000"
-        };
-    }
-}).addTo(map);
-
-// LAYER TITIK
-L.geoJson(
-json_DataPersebaranNew_2,
-{
-    pointToLayer:function(feature,latlng){
-
-    if(!feature.geometry){
-        return null;
-    }
-
-    var color=
-        feature.properties.Jenis==="TPS3R"
-        ?"rgba(13,0,229,1)"
-        :"rgba(226,11,0,1)";
-
-        return L.circleMarker(
-            latlng,
-            {
-                radius:6,
-                fillColor:color,
-                color:"#000",
-                fillOpacity:0.8
+                case "Denpasar Utara":
+                    return{
+                        color:"#000",
+                        weight:3,
+                        fillColor:"rgba(213,122,0,0.67)",
+                        fillOpacity:0.67
+                    };
             }
-        );
-    },
 
-    onEachFeature:function(feature,layer){
-
-        if(feature.properties){
-
-     layer.bindPopup(
-
-'<div style="min-width:230px;">'+
-
-'<h3 style="margin-bottom:10px;">'
-+(feature.properties.Nama||'-')+
-'</h3>'+
-
-'<hr>'+
-
-'<b>♻ Jenis:</b><br>'
-+(feature.properties.Jenis||'-')+
-
-'<br><br>'+
-
-'<b>📍 Koordinat:</b><br>'
-+feature.properties.Latitude+
-', '
-+feature.properties.Longitude+
-
-'<br><br>'+
-
-(feature.properties.Link_Gmaps
-? '<a target="_blank" href="'+
-feature.properties.Link_Gmaps+
-'">🗺 Buka Google Maps</a>'
-: '<i>Link tidak tersedia</i>')
-+
-
-'</div>'
-);
+            return{
+                color:"#000",
+                fillOpacity:0
+            };
         }
     }
-}).addTo(map);
+).addTo(map);
 
-    // STATISTIK OTOMATIS
-var totalTPS3R=0;
-var totalTPST=0;
+
+// =====================
+// LAYER TITIK
+// =====================
+var titikLayer = L.geoJson(
+    json_DataPersebaranNew_2,
+    {
+
+        // abaikan data rusak
+        filter:function(feature){
+
+            return (
+                feature &&
+                feature.geometry &&
+                feature.geometry.type==="Point"
+            );
+
+        },
+
+        pointToLayer:function(feature,latlng){
+
+            var color =
+            feature.properties.Jenis==="TPS3R"
+            ? "rgba(13,0,229,1)"
+            : "rgba(226,11,0,1)";
+
+            return L.circleMarker(
+                latlng,
+                {
+                    radius:6,
+                    fillColor:color,
+                    color:"#000",
+                    weight:1,
+                    fillOpacity:0.8
+                }
+            );
+
+        },
+
+        onEachFeature:function(feature,layer){
+
+            var nama =
+                feature.properties.Nama || "-";
+
+            var jenis =
+                feature.properties.Jenis || "-";
+
+            var lat =
+                feature.properties.Latitude || "-";
+
+            var lon =
+                feature.properties.Longitude || "-";
+
+            var link =
+                feature.properties.Link_Gmaps;
+
+            var popup =
+            '<div style="min-width:220px;">'+
+            '<h3>'+nama+'</h3>'+
+            '<hr>'+
+            '<b>♻ Jenis:</b><br>'+jenis+
+            '<br><br>'+
+            '<b>📍 Koordinat:</b><br>'+
+            lat+', '+lon+
+            '<br><br>';
+
+            if(link){
+
+                popup +=
+                '<a href="'+link+
+                '" target="_blank">🗺 Buka Google Maps</a>';
+
+            }else{
+
+                popup +=
+                '<i>Link tidak tersedia</i>';
+
+            }
+
+            popup += '</div>';
+
+            layer.bindPopup(popup);
+
+        }
+
+    }
+).addTo(map);
+
+
+// =====================
+// STATISTIK
+// =====================
+var totalTPS3R = 0;
+var totalTPST = 0;
 
 json_DataPersebaranNew_2.features.forEach(function(f){
 
-    if(!f.properties) return;
+    if(
+        !f ||
+        !f.properties ||
+        !f.geometry
+    ){
+        return;
+    }
 
     if(f.properties.Jenis==="TPS3R")
         totalTPS3R++;
@@ -497,20 +553,18 @@ json_DataPersebaranNew_2.features.forEach(function(f){
 
 document.getElementById(
     'statistik'
-).innerHTML=
+).innerHTML =
 
-'<li><b>Total TPS3R :</b> '
-+totalTPS3R+
+'<li><b>Total TPS3R :</b> '+
+totalTPS3R+
 '</li><br>'+
 
-'<li><b>Total TPST :</b> '
-+totalTPST+
+'<li><b>Total TPST :</b> '+
+totalTPST+
 '</li><br>'+
 
-'<li><b>Total Keseluruhan :</b> '
-+(totalTPS3R+totalTPST)+
+'<li><b>Total Keseluruhan :</b> '+
+(totalTPS3R+totalTPST)+
 '</li>';
-</script>
 
-</body>
-</html>
+</script>
