@@ -4,53 +4,59 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Peta Persebaran PSBS</title>
-    <link rel="stylesheet" href="css/leaflet.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
         #map { width: 100%; height: 100vh; }
         .info-container {
             position: fixed; bottom: 0; left: 0; width: 100%; height: 20vh;
             background: white; z-index: 1000; padding: 20px; box-sizing: border-box;
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.3); overflow-y: auto; transition: height 0.3s;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.3); overflow-y: auto; transition: height 0.3s; text-align: center;
         }
         .info-container.expanded { height: 80vh; }
-        img { width: 100%; max-width: 600px; display: block; margin: 0 auto; }
+        .drag-handle { width: 50px; height: 6px; background: #ccc; border-radius: 5px; margin: 0 auto 20px auto; cursor: pointer; }
+        img { width: 100%; max-width: 600px; height: auto; display: block; margin: 0 auto; }
     </style>
 </head>
 <body>
 
     <div id="map"></div>
     <div class="info-container" id="infoBox" onclick="this.classList.toggle('expanded')">
+        <div class="drag-handle"></div>
         <h1>Keterangan Peta</h1>
-        <p>Klik panel ini untuk memperbesar/memperkecil.</p>
         <img src="Peta Persebaran TPS3R & TPST.jpeg" alt="Legenda">
+        <p>Klik untuk memperbesar. Data TPS3R dan TPST Denpasar.</p>
     </div>
 
-    <script src="js/leaflet.js"></script>
-    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="data/ADMINISTRASIKECAMATAN_AR_1.js"></script>
     <script src="data/DataPersebaranNew_2.js"></script>
 
     <script>
-        var map = L.map('map').setView([-8.695, 115.211], 12);
+        var map = L.map('map').setView([-8.65, 115.22], 12);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
 
-        // Menampilkan Layer Wilayah
+        // Menambahkan Layer Wilayah
         L.geoJson(json_ADMINISTRASIKECAMATAN_AR_1, {
-            style: { color: "#333", weight: 2, fillOpacity: 0.3 }
+            style: { color: "#333", weight: 2, fillOpacity: 0.2 }
         }).addTo(map);
 
-        // Menampilkan Titik
+        // Menambahkan Layer Titik
         L.geoJson(json_DataPersebaranNew_2, {
             pointToLayer: function (feature, latlng) {
-                return L.circleMarker(latlng, { radius: 6, fillColor: "red", color: "#000", fillOpacity: 0.8 });
+                // Hanya buat titik jika geometry tidak null
+                if (feature.geometry) {
+                    var color = (feature.properties.Jenis === "TPS3R") ? "blue" : "red";
+                    return L.circleMarker(latlng, { radius: 6, fillColor: color, color: "#000", fillOpacity: 0.8 });
+                }
             },
             onEachFeature: function (feature, layer) {
-                // Pastikan nama kolom di bawah ini SAMA dengan yang ada di QGIS kamu (perhatikan huruf besar/kecil)
-                var popupContent = "<b>" + feature.properties.Nama + "</b><br>" + 
-                                   "Jenis: " + feature.properties.Jenis + "<br>" +
-                                   "<a href='" + feature.properties.Link_Gmaps + "' target='_blank'>Buka di Gmaps</a>";
-                layer.bindPopup(popupContent);
+                if (feature.properties && feature.properties.Nama) {
+                    var popup = "<b>" + feature.properties.Nama + "</b><br>" + 
+                                "Jenis: " + (feature.properties.Jenis || "-") + "<br>" +
+                                "<a href='" + feature.properties.Link_Gmaps + "' target='_blank'>Buka di Google Maps</a>";
+                    layer.bindPopup(popup);
+                }
             }
         }).addTo(map);
     </script>
