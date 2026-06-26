@@ -242,13 +242,19 @@ L.tileLayer(
 }).addTo(map);
 
 // Layer wilayah
-L.geoJson(json_ADMINISTRASIKECAMATAN_AR_1, {
-
+L.geoJson(json_ADMINISTRASIKECAMATAN_AR_1,{
     style:function(feature){
 
-        switch(String(feature.properties.NAMOBJ)){
+        console.log(feature.properties.NAMOBJ);
 
-            case "Denpasar Barat":
+        return{
+            color:"#000",
+            weight:3,
+            fillColor:"red",
+            fillOpacity:0.5
+        };
+    }
+}).addTo(map);
                 return {
                     color:"#000000",
                     weight:3,
