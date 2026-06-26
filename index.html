@@ -322,8 +322,15 @@ locate.onAdd=function(){
 
 locate.addTo(map);
 
+// BASEMAP
 L.tileLayer(
-    document.addEventListener('click',function(e){
+'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+{
+    attribution:'© OpenStreetMap'
+}).addTo(map);
+
+// GPS BUTTON
+document.addEventListener('click',function(e){
 
     if(e.target.id==="locateBtn"){
 
@@ -357,16 +364,9 @@ map.on('locationfound',function(e){
 
 map.on('locationerror',function(){
 
-    alert(
-        "GPS tidak dapat diakses."
-    );
+    alert("GPS tidak dapat diakses.");
 
 });
-'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-{
-    attribution:'© OpenStreetMap'
-}).addTo(map);
-
 // LAYER WILAYAH
 L.geoJson(
 json_ADMINISTRASIKECAMATAN_AR_1,
@@ -420,7 +420,11 @@ json_DataPersebaranNew_2,
 {
     pointToLayer:function(feature,latlng){
 
-        var color=
+    if(!feature.geometry){
+        return null;
+    }
+
+    var color=
         feature.properties.Jenis==="TPS3R"
         ?"rgba(13,0,229,1)"
         :"rgba(226,11,0,1)";
@@ -462,9 +466,12 @@ json_DataPersebaranNew_2,
 
 '<br><br>'+
 
-'<a target="_blank" href="'+
+(feature.properties.Link_Gmaps
+? '<a target="_blank" href="'+
 feature.properties.Link_Gmaps+
-'">🗺 Buka Google Maps</a>'+
+'">🗺 Buka Google Maps</a>'
+: '<i>Link tidak tersedia</i>')
++
 
 '</div>'
 );
