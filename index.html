@@ -7,9 +7,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
-        #map { width: 100%; height: 100vh; z-index: 1; }
-        
-        /* Panel keterangan lebih kecil saat tertutup */
+        #map { width: 100%; height: 100vh; }
         .info-container {
             position: fixed; bottom: 0; left: 0; width: 100%; height: 15vh;
             background: white; z-index: 1000; padding: 10px; border-radius: 15px 15px 0 0;
@@ -19,7 +17,7 @@
         .info-container.expanded { height: 70vh; }
         .drag-handle { width: 40px; height: 5px; background: #bbb; border-radius: 5px; margin: 0 auto 10px auto; }
         img { width: 90%; max-width: 500px; height: auto; display: block; margin: 10px auto; }
-        .label-class { font-weight: bold; color: #333; text-shadow: 1px 1px 1px #fff; }
+        .label-class { font-weight: bold; color: #333; text-shadow: 1px 1px 1px #fff; background: none; border: none; box-shadow: none; }
     </style>
 </head>
 <body>
@@ -36,33 +34,30 @@
     <script src="data/DataPersebaranNew_2.js"></script>
 
     <script>
-        // Inisialisasi Peta
         var map = L.map('map').setView([-8.65, 115.22], 12);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-        // Menambahkan Layer Wilayah DENGAN WARNA
+        // 1. Layer Wilayah: Mengambil Style Asli dari QGIS
         L.geoJson(json_ADMINISTRASIKECAMATAN_AR_1, {
-            style: function(feature) {
-                // Warna otomatis berdasarkan nama wilayah
-                var n = feature.properties.NAMOBJ;
-                return {
-                    fillColor: (n === "Denpasar Barat") ? "#FF9999" : (n === "Denpasar Selatan") ? "#99FF99" : "#9999FF",
-                    weight: 2, opacity: 1, color: 'white', fillOpacity: 0.6
-                };
-            },
+            style: style_ADMINISTRASIKECAMATAN_AR_1_0, // Fungsi dari file .js kamu
             onEachFeature: function(feature, layer) {
-                // Menampilkan nama daerah di atas peta
                 layer.bindTooltip(feature.properties.NAMOBJ, {permanent: true, direction: "center", className: "label-class"});
             }
         }).addTo(map);
 
-        // Menambahkan Layer Titik
+        // 2. Layer Titik: Logika Warna Biru & Merah
         L.geoJson(json_DataPersebaranNew_2, {
             pointToLayer: function (feature, latlng) {
-                return L.circleMarker(latlng, { radius: 6, fillColor: "red", color: "#000", fillOpacity: 0.8 });
+                var isTPS3R = (feature.properties.Jenis === "TPS3R");
+                return L.circleMarker(latlng, { 
+                    radius: 6, 
+                    fillColor: isTPS3R ? "blue" : "red", 
+                    color: "#000", 
+                    fillOpacity: 0.8 
+                });
             },
             onEachFeature: function (feature, layer) {
-                layer.bindPopup("<b>" + feature.properties.Nama + "</b><br><a href='" + feature.properties.Link_Gmaps + "' target='_blank'>Buka di Maps</a>");
+                layer.bindPopup("<b>" + feature.properties.Nama + "</b><br><a href='" + feature.properties.Link_Gmaps + "' target='_blank'>Buka di Google Maps</a>");
             }
         }).addTo(map);
     </script>
