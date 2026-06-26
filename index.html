@@ -1,36 +1,70 @@
-// 1. Menambahkan Layer Wilayah (Warna & Judul)
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peta Persebaran PSBS</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+        #map { width: 100%; height: 100vh; z-index: 1; }
+        
+        /* Panel keterangan lebih kecil saat tertutup */
+        .info-container {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 15vh;
+            background: white; z-index: 1000; padding: 10px; border-radius: 15px 15px 0 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.2); overflow-y: auto; transition: height 0.3s;
+            text-align: center;
+        }
+        .info-container.expanded { height: 70vh; }
+        .drag-handle { width: 40px; height: 5px; background: #bbb; border-radius: 5px; margin: 0 auto 10px auto; }
+        img { width: 90%; max-width: 500px; height: auto; display: block; margin: 10px auto; }
+        .label-class { font-weight: bold; color: #333; text-shadow: 1px 1px 1px #fff; }
+    </style>
+</head>
+<body>
+
+    <div id="map"></div>
+    <div class="info-container" id="infoBox" onclick="this.classList.toggle('expanded')">
+        <div class="drag-handle"></div>
+        <h3 style="margin:0;">Keterangan Peta</h3>
+        <img src="Peta Persebaran TPS3R & TPST.jpeg" alt="Legenda">
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="data/ADMINISTRASIKECAMATAN_AR_1.js"></script>
+    <script src="data/DataPersebaranNew_2.js"></script>
+
+    <script>
+        // Inisialisasi Peta
+        var map = L.map('map').setView([-8.65, 115.22], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+
+        // Menambahkan Layer Wilayah DENGAN WARNA
         L.geoJson(json_ADMINISTRASIKECAMATAN_AR_1, {
             style: function(feature) {
-                // Kamu bisa memanggil fungsi style asli dari QGIS di sini
-                // atau mendefinisikan warna manual berdasarkan nama kecamatan
+                // Warna otomatis berdasarkan nama wilayah
+                var n = feature.properties.NAMOBJ;
                 return {
-                    color: '#323232', 
-                    weight: 2, 
-                    fillOpacity: 0.6,
-                    fillColor: (feature.properties.NAMOBJ === 'Denpasar Barat') ? '#7bff00' : 
-                               (feature.properties.NAMOBJ === 'Denpasar Selatan') ? '#00e3ae' :
-                               (feature.properties.NAMOBJ === 'Denpasar Timur') ? '#700cd9' : '#d57a00'
+                    fillColor: (n === "Denpasar Barat") ? "#FF9999" : (n === "Denpasar Selatan") ? "#99FF99" : "#9999FF",
+                    weight: 2, opacity: 1, color: 'white', fillOpacity: 0.6
                 };
             },
             onEachFeature: function(feature, layer) {
-                // 2. Menambahkan Label Nama Daerah
-                if (feature.properties && feature.properties.NAMOBJ) {
-                    layer.bindTooltip(feature.properties.NAMOBJ, {
-                        permanent: true, 
-                        direction: 'center', 
-                        className: 'label-style'
-                    });
-                }
+                // Menampilkan nama daerah di atas peta
+                layer.bindTooltip(feature.properties.NAMOBJ, {permanent: true, direction: "center", className: "label-class"});
             }
         }).addTo(map);
 
-        // Tambahkan CSS ini di antara tag <style> agar label terlihat bagus
-        /* .label-style {
-            background: none !important;
-            border: none !important;
-            box-shadow: none !important;
-            font-weight: bold;
-            color: #333;
-            font-size: 14px;
-        } 
-        */
+        // Menambahkan Layer Titik
+        L.geoJson(json_DataPersebaranNew_2, {
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, { radius: 6, fillColor: "red", color: "#000", fillOpacity: 0.8 });
+            },
+            onEachFeature: function (feature, layer) {
+                layer.bindPopup("<b>" + feature.properties.Nama + "</b><br><a href='" + feature.properties.Link_Gmaps + "' target='_blank'>Buka di Maps</a>");
+            }
+        }).addTo(map);
+    </script>
+</body>
+</html>
