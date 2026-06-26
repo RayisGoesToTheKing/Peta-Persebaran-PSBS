@@ -1,4 +1,3 @@
-```html
 <!doctype html>
 <html lang="id">
 <head>
@@ -17,156 +16,110 @@ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     box-sizing:border-box;
 }
 
-html{
-    scroll-behavior:smooth;
-}
-
 body{
-    font-family:Arial, sans-serif;
-    background:#f5f5f5;
+    font-family:Arial,sans-serif;
+    overflow:hidden;
 }
 
-/* HEADER */
-.header{
-    background:#1f2937;
-    color:white;
-    text-align:center;
-    padding:20px;
-}
-
-.header h1{
-    font-size:32px;
-}
-
-.header p{
-    margin-top:10px;
-}
-
-/* MAP */
+/* PETA */
 #map{
-    width:100%;
+    width:100vw;
     height:100vh;
 }
 
-/* TOMBOL SCROLL */
-.scroll-container{
+/* BOTTOM SHEET */
+.bottom-sheet{
+    position:fixed;
+    left:0;
+    bottom:0;
+    width:100%;
+    height:120px;
     background:white;
-    padding:20px;
-    text-align:center;
+    z-index:1000;
+    border-radius:20px 20px 0 0;
+    box-shadow:0 -5px 20px rgba(0,0,0,.3);
+    transition:.3s;
+    overflow-y:auto;
 }
 
-#scrollButton{
-    background:#1f2937;
-    color:white;
-    border:none;
-    padding:16px 35px;
-    border-radius:40px;
-    font-size:18px;
-    font-weight:bold;
-    cursor:pointer;
-    transition:0.3s;
-    box-shadow:0 3px 10px rgba(0,0,0,0.2);
+.bottom-sheet.expanded{
+    height:75vh;
 }
 
-#scrollButton:hover{
-    transform:translateY(-2px);
-    background:#374151;
-}
-
-/* SECTION */
-.section{
-    background:white;
-    width:95%;
-    max-width:1400px;
-    margin:30px auto;
-    padding:30px;
+.drag-handle{
+    width:60px;
+    height:6px;
+    background:#bbb;
     border-radius:10px;
-    box-shadow:0 0 15px rgba(0,0,0,0.1);
+    margin:15px auto;
 }
 
-.section h2{
+.content{
+    padding:20px;
+}
+
+.content h1,
+.content h2{
+    margin-bottom:15px;
     text-align:center;
-    margin-bottom:20px;
 }
 
-/* IMAGE */
 .layout-image{
     width:100%;
     border-radius:10px;
     border:1px solid #ddd;
+    margin-bottom:20px;
 }
 
-/* GRID */
 .grid{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:30px;
+    gap:20px;
 }
 
 .card{
-    background:#fafafa;
+    background:#f7f7f7;
     padding:20px;
     border-radius:10px;
-    border:1px solid #ddd;
 }
 
-.card ul{
-    padding-left:20px;
-}
-
-/* LEGENDA */
 .legend-item{
     display:flex;
     align-items:center;
-    margin-bottom:15px;
+    margin-bottom:12px;
 }
 
 .box{
     width:25px;
     height:25px;
-    border:1px solid black;
     margin-right:10px;
+    border:1px solid black;
 }
 
 .circle{
     width:20px;
     height:20px;
     border-radius:50%;
-    border:1px solid black;
     margin-right:10px;
+    border:1px solid black;
 }
 
-/* FOOTER */
-.footer{
-    background:#1f2937;
-    color:white;
-    text-align:center;
-    padding:20px;
-    margin-top:30px;
+.card ul{
+    padding-left:20px;
 }
 
-/* MOBILE */
 @media(max-width:768px){
 
     .grid{
         grid-template-columns:1fr;
     }
 
-    .header h1{
-        font-size:24px;
+    .bottom-sheet{
+        height:100px;
     }
 
-    #scrollButton{
-        width:95%;
-        font-size:18px;
-        padding:18px;
-    }
-
-    .scroll-container{
-        position:sticky;
-        bottom:0;
-        z-index:1000;
-        box-shadow:0 -5px 20px rgba(0,0,0,0.2);
+    .bottom-sheet.expanded{
+        height:80vh;
     }
 }
 </style>
@@ -174,106 +127,92 @@ body{
 
 <body>
 
-<!-- HEADER -->
-<div class="header">
-    <h1>PETA PERSEBARAN TPS3R & TPST</h1>
-    <p>Kota Denpasar Tahun 2026</p>
-</div>
-
-<!-- PETA -->
 <div id="map"></div>
 
-<!-- TOMBOL -->
-<div class="scroll-container">
-    <button id="scrollButton">
-        📄 Lihat Layout, Legenda & Statistik
-    </button>
-</div>
+<div class="bottom-sheet" id="sheet">
 
-<!-- INFORMASI -->
-<div class="section" id="infoSection">
+    <div class="drag-handle"></div>
 
-    <h2>Layout Peta Persebaran</h2>
+    <div class="content">
 
-    <img
+        <h1>Peta Persebaran TPS3R & TPST</h1>
+
+        <img
         src="Peta Persebaran TPS3R & TPST.jpeg"
-        class="layout-image"
-        alt="Layout Peta">
+        class="layout-image">
 
-</div>
+        <div class="grid">
 
-<div class="section">
+            <div class="card">
 
-    <div class="grid">
+                <h2>Legenda</h2>
 
-        <div class="card">
+                <div class="legend-item">
+                    <div class="box" style="background:#9bf043"></div>
+                    Denpasar Barat
+                </div>
 
-            <h2>Legenda</h2>
+                <div class="legend-item">
+                    <div class="box" style="background:#d89d43"></div>
+                    Denpasar Utara
+                </div>
 
-            <div class="legend-item">
-                <div class="box" style="background:#9bf043"></div>
-                Denpasar Barat
+                <div class="legend-item">
+                    <div class="box" style="background:#9c63d8"></div>
+                    Denpasar Timur
+                </div>
+
+                <div class="legend-item">
+                    <div class="box" style="background:#6ad4c1"></div>
+                    Denpasar Selatan
+                </div>
+
+                <br>
+
+                <div class="legend-item">
+                    <div class="circle"
+                    style="background:rgba(13,0,229,1)">
+                    </div>
+                    TPS3R
+                </div>
+
+                <div class="legend-item">
+                    <div class="circle"
+                    style="background:rgba(226,11,0,1)">
+                    </div>
+                    TPST
+                </div>
+
             </div>
 
-            <div class="legend-item">
-                <div class="box" style="background:#d89d43"></div>
-                Denpasar Utara
+            <div class="card">
+
+                <h2>Jumlah Unit</h2>
+
+                <ul>
+                    <li>Denpasar Barat : 7 TPS3R, 1 TPST</li>
+                    <li>Denpasar Utara : 4 TPS3R</li>
+                    <li>Denpasar Timur : 6 TPS3R, 2 TPST</li>
+                    <li>Denpasar Selatan : 7 TPS3R, 1 TPST</li>
+                </ul>
+
+                <br>
+
+                <h2>Sumber Data</h2>
+
+                <ul>
+                    <li>OpenStreetMap</li>
+                    <li>Google Maps</li>
+                    <li>DLHK Kota Denpasar</li>
+                    <li>Portal Open Data</li>
+                </ul>
+
             </div>
-
-            <div class="legend-item">
-                <div class="box" style="background:#9c63d8"></div>
-                Denpasar Timur
-            </div>
-
-            <div class="legend-item">
-                <div class="box" style="background:#6ad4c1"></div>
-                Denpasar Selatan
-            </div>
-
-            <br>
-
-            <div class="legend-item">
-                <div class="circle" style="background:blue"></div>
-                TPS3R
-            </div>
-
-            <div class="legend-item">
-                <div class="circle" style="background:red"></div>
-                TPST
-            </div>
-
-        </div>
-
-        <div class="card">
-
-            <h2>Jumlah Unit</h2>
-
-            <ul>
-                <li>Denpasar Barat : 7 TPS3R, 1 TPST</li>
-                <li>Denpasar Utara : 4 TPS3R, 0 TPST</li>
-                <li>Denpasar Timur : 6 TPS3R, 2 TPST</li>
-                <li>Denpasar Selatan : 7 TPS3R, 1 TPST</li>
-            </ul>
-
-            <br>
-
-            <h2>Sumber Data</h2>
-
-            <ul>
-                <li>OpenStreetMap Contributors</li>
-                <li>Google Maps</li>
-                <li>DLHK Kota Denpasar</li>
-                <li>Portal Denpasar Open Data</li>
-            </ul>
 
         </div>
 
     </div>
 
-</div>
-
-<div class="footer">
-    WebGIS Persebaran TPS3R & TPST Kota Denpasar © 2026
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -283,121 +222,114 @@ body{
 
 <script>
 
-// tombol scroll
-document.getElementById("scrollButton")
-.addEventListener("click",function(){
+// Bottom Sheet
+const sheet=document.getElementById('sheet');
 
-    document
-    .getElementById("infoSection")
-    .scrollIntoView({
-        behavior:"smooth"
-    });
+sheet.addEventListener('click',function(e){
+
+    if(e.target===sheet ||
+       e.target.classList.contains('drag-handle')){
+        sheet.classList.toggle('expanded');
+    }
 
 });
 
-// Membuat peta
-var map = L.map('map').setView([-8.65,115.22],12);
+// MAP
+var map=L.map('map').setView([-8.65,115.22],12);
 
-// Basemap
 L.tileLayer(
 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 {
     attribution:'© OpenStreetMap'
 }).addTo(map);
 
-// Layer wilayah
-L.geoJson(json_ADMINISTRASIKECAMATAN_AR_1, {
-
+// Kecamatan
+L.geoJson(
+json_ADMINISTRASIKECAMATAN_AR_1,
+{
     style:function(feature){
 
         switch(String(feature.properties.NAMOBJ)){
 
             case "Denpasar Barat":
-                return {
-                    color:"#000000",
+                return{
+                    color:"#000",
                     weight:3,
-                    opacity:1,
                     fillColor:"rgba(123,255,0,0.62)",
                     fillOpacity:0.62
                 };
 
             case "Denpasar Selatan":
-                return {
-                    color:"#000000",
+                return{
+                    color:"#000",
                     weight:3,
-                    opacity:1,
                     fillColor:"rgba(0,227,174,0.51)",
                     fillOpacity:0.51
                 };
 
             case "Denpasar Timur":
-                return {
-                    color:"#000000",
+                return{
+                    color:"#000",
                     weight:3,
-                    opacity:1,
                     fillColor:"rgba(112,12,217,0.57)",
                     fillOpacity:0.57
                 };
 
             case "Denpasar Utara":
-                return {
-                    color:"#000000",
+                return{
+                    color:"#000",
                     weight:3,
-                    opacity:1,
                     fillColor:"rgba(213,122,0,0.67)",
                     fillOpacity:0.67
                 };
         }
 
-        return {
-            color:"#000",
-            weight:2,
-            fillOpacity:0
+        return{
+            color:"#000"
         };
     }
-
 }).addTo(map);
 
-// Layer titik
+// Titik
 L.geoJson(
-    json_DataPersebaranNew_2,
-    {
-        pointToLayer:function(feature,latlng){
+json_DataPersebaranNew_2,
+{
+    pointToLayer:function(feature,latlng){
 
-            var color =
-            feature.properties.Jenis==="TPS3R"
-            ? "rgba(13,0,229,1)"
-            : "rgba(226,11,0,1)";
+        var color=
+        feature.properties.Jenis==="TPS3R"
+        ?"rgba(13,0,229,1)"
+        :"rgba(226,11,0,1)";
 
-            return L.circleMarker(
-                latlng,
-                {
-                    radius:6,
-                    fillColor:color,
-                    color:"#000",
-                    fillOpacity:0.8
-                }
-            );
-        },
+        return L.circleMarker(
+            latlng,
+            {
+                radius:6,
+                fillColor:color,
+                color:"#000",
+                fillOpacity:0.8
+            }
+        );
+    },
 
-        onEachFeature:function(feature,layer){
+    onEachFeature:function(feature,layer){
 
-            var popup =
+        if(feature.properties){
+
+            layer.bindPopup(
                 "<b>"+feature.properties.Nama+"</b><br>"+
                 "Jenis: "+
-                (feature.properties.Jenis||"-")+
+                feature.properties.Jenis+
                 "<br><br>"+
                 "<a href='"+
                 feature.properties.Link_Gmaps+
-                "' target='_blank'>Buka di Google Maps</a>";
-
-            layer.bindPopup(popup);
+                "' target='_blank'>Buka di Google Maps</a>"
+            );
         }
     }
-).addTo(map);
+}).addTo(map);
 
 </script>
 
 </body>
 </html>
-```
