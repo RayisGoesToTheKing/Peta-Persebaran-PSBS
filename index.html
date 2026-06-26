@@ -1,3 +1,4 @@
+```html
 <!doctype html>
 <html lang="id">
 <head>
@@ -14,6 +15,10 @@ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     margin:0;
     padding:0;
     box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
 }
 
 body{
@@ -41,6 +46,31 @@ body{
 #map{
     width:100%;
     height:100vh;
+}
+
+/* TOMBOL SCROLL */
+.scroll-container{
+    background:white;
+    padding:20px;
+    text-align:center;
+}
+
+#scrollButton{
+    background:#1f2937;
+    color:white;
+    border:none;
+    padding:16px 35px;
+    border-radius:40px;
+    font-size:18px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.3s;
+    box-shadow:0 3px 10px rgba(0,0,0,0.2);
+}
+
+#scrollButton:hover{
+    transform:translateY(-2px);
+    background:#374151;
 }
 
 /* SECTION */
@@ -80,6 +110,10 @@ body{
     border:1px solid #ddd;
 }
 
+.card ul{
+    padding-left:20px;
+}
+
 /* LEGENDA */
 .legend-item{
     display:flex;
@@ -111,13 +145,28 @@ body{
     margin-top:30px;
 }
 
+/* MOBILE */
 @media(max-width:768px){
+
     .grid{
         grid-template-columns:1fr;
     }
 
     .header h1{
         font-size:24px;
+    }
+
+    #scrollButton{
+        width:95%;
+        font-size:18px;
+        padding:18px;
+    }
+
+    .scroll-container{
+        position:sticky;
+        bottom:0;
+        z-index:1000;
+        box-shadow:0 -5px 20px rgba(0,0,0,0.2);
     }
 }
 </style>
@@ -131,11 +180,18 @@ body{
     <p>Kota Denpasar Tahun 2026</p>
 </div>
 
-<!-- PETA INTERAKTIF -->
+<!-- PETA -->
 <div id="map"></div>
 
-<!-- GAMBAR PETA -->
-<div class="section">
+<!-- TOMBOL -->
+<div class="scroll-container">
+    <button id="scrollButton">
+        📄 Lihat Layout, Legenda & Statistik
+    </button>
+</div>
+
+<!-- INFORMASI -->
+<div class="section" id="infoSection">
 
     <h2>Layout Peta Persebaran</h2>
 
@@ -146,12 +202,10 @@ body{
 
 </div>
 
-<!-- INFORMASI -->
 <div class="section">
 
     <div class="grid">
 
-        <!-- LEGENDA -->
         <div class="card">
 
             <h2>Legenda</h2>
@@ -190,7 +244,6 @@ body{
 
         </div>
 
-        <!-- DATA -->
         <div class="card">
 
             <h2>Jumlah Unit</h2>
@@ -219,7 +272,6 @@ body{
 
 </div>
 
-<!-- FOOTER -->
 <div class="footer">
     WebGIS Persebaran TPS3R & TPST Kota Denpasar © 2026
 </div>
@@ -230,6 +282,18 @@ body{
 <script src="data/DataPersebaranNew_2.js"></script>
 
 <script>
+
+// tombol scroll
+document.getElementById("scrollButton")
+.addEventListener("click",function(){
+
+    document
+    .getElementById("infoSection")
+    .scrollIntoView({
+        behavior:"smooth"
+    });
+
+});
 
 // Membuat peta
 var map = L.map('map').setView([-8.65,115.22],12);
@@ -300,41 +364,34 @@ L.geoJson(
     {
         pointToLayer:function(feature,latlng){
 
-            if(feature.geometry){
-
             var color =
-feature.properties.Jenis==="TPS3R"
-? "rgba(13,0,229,1)"
-: "rgba(226,11,0,1)";
+            feature.properties.Jenis==="TPS3R"
+            ? "rgba(13,0,229,1)"
+            : "rgba(226,11,0,1)";
 
-                return L.circleMarker(
-                    latlng,
-                    {
-                        radius:6,
-                        fillColor:color,
-                        color:"#000",
-                        fillOpacity:0.8
-                    }
-                );
-            }
+            return L.circleMarker(
+                latlng,
+                {
+                    radius:6,
+                    fillColor:color,
+                    color:"#000",
+                    fillOpacity:0.8
+                }
+            );
         },
 
         onEachFeature:function(feature,layer){
 
-            if(feature.properties &&
-               feature.properties.Nama){
+            var popup =
+                "<b>"+feature.properties.Nama+"</b><br>"+
+                "Jenis: "+
+                (feature.properties.Jenis||"-")+
+                "<br><br>"+
+                "<a href='"+
+                feature.properties.Link_Gmaps+
+                "' target='_blank'>Buka di Google Maps</a>";
 
-                var popup =
-                    "<b>"+feature.properties.Nama+"</b><br>"+
-                    "Jenis: "+
-                    (feature.properties.Jenis||"-")+
-                    "<br><br>"+
-                    "<a href='"+
-                    feature.properties.Link_Gmaps+
-                    "' target='_blank'>Buka di Google Maps</a>";
-
-                layer.bindPopup(popup);
-            }
+            layer.bindPopup(popup);
         }
     }
 ).addTo(map);
@@ -343,3 +400,4 @@ feature.properties.Jenis==="TPS3R"
 
 </body>
 </html>
+```
