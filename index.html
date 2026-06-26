@@ -6,51 +6,34 @@
         <link rel="stylesheet" href="css/leaflet.css">
         <link rel="stylesheet" href="css/qgis2web.css">
         <style>
-            html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
-            #map { width: 100%; height: 100vh; }
-            .info-container {
-                position: fixed; bottom: 0; left: 0; width: 100%; height: 20vh;
-                background: white; z-index: 1000; border-radius: 20px 20px 0 0;
-                box-shadow: 0 -5px 15px rgba(0,0,0,0.3); overflow-y: auto;
-                transition: height 0.3s ease; padding: 20px; box-sizing: border-box; text-align: center;
-            }
-            .info-container.expanded { height: 80vh; }
-            .drag-handle { width: 50px; height: 6px; background: #ccc; border-radius: 5px; margin: 0 auto 10px auto; cursor: pointer; }
-            img { width: 100%; max-width: 600px; height: auto; }
+            html, body, #map { width: 100%; height: 100%; padding: 0; margin: 0; }
         </style>
-        <title>Peta Persebaran PSBS</title>
     </head>
     <body>
         <div id="map"></div>
 
-        <div class="info-container" id="infoBox" onclick="this.classList.toggle('expanded')">
-            <div class="drag-handle"></div>
-            <h1>Keterangan Peta</h1>
-            <img src="Peta Persebaran TPS3R & TPST.jpeg" alt="Legenda">
-            <p>Data TPS3R dan TPST Denpasar.</p>
-        </div>
-
         <script src="js/leaflet.js"></script>
-        <script src="js/Autolinker.min.js"></script>
         <script src="data/ADMINISTRASIKECAMATAN_AR_1.js"></script>
         <script src="data/DataPersebaranNew_2.js"></script>
-        <script src="js/labels.js"></script>
-        
+
         <script>
-            // Inisialisasi Peta (Kode asli QGIS)
-            var map = L.map('map', { zoomControl:true }).fitBounds([[-8.77,115.06],[-8.61,115.35]]);
-            
-            // Layer Peta Dasar
+            var map = L.map('map').fitBounds([[-8.77, 115.06], [-8.61, 115.35]]);
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
 
-            // Layer Wilayah (Menggunakan style dari QGIS)
-            function style_ADMIN_0() { return { color: '#333', weight: 2, fillColor: '#ccc', fillOpacity: 0.5 }; }
-            L.geoJson(json_ADMINISTRASIKECAMATAN_AR_1, { style: style_ADMIN_0 }).addTo(map);
+            // MEMANGGIL STYLE DARI QGIS
+            // Kita menggunakan fungsi style_ADMINISTRASIKECAMATAN_AR_1_0 
+            // yang sudah otomatis dibuatkan oleh QGIS di bagian bawah script kamu
+            L.geoJson(json_ADMINISTRASIKECAMATAN_AR_1, {
+                style: style_ADMINISTRASIKECAMATAN_AR_1_0, 
+                onEachFeature: function(feature, layer) {
+                    layer.bindTooltip(feature.properties.NAMOBJ, {permanent: true, className: 'label-class'});
+                }
+            }).addTo(map);
 
-            // Layer Titik
             L.geoJson(json_DataPersebaranNew_2, {
-                pointToLayer: function(f, latlng) { return L.circleMarker(latlng, { radius: 6, fillColor: 'red', color: '#000' }); },
-                onEachFeature: function(f, layer) { layer.bindPopup("<b>" + f.properties.Nama + "</b>"); }
+                pointToLayer: function(feature, latlng) {
+                    return L.circleMarker(latlng, style_DataPersebaranNew_2_0(feature));
+                }
             }).addTo(map);
         </script>
     </body>
