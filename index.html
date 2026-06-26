@@ -245,11 +245,55 @@ L.tileLayer(
 L.geoJson(
     json_ADMINISTRASIKECAMATAN_AR_1,
     {
-        style:{
-            color:"#333",
-            weight:2,
-            fillOpacity:0.2
+
+        style:function(feature){
+
+            var kec = feature.properties.WADMKC;
+
+            if(kec=="Denpasar Barat"){
+                return{
+                    fillColor:"#A6F13D",
+                    fillOpacity:0.55,
+                    color:"#111111",
+                    weight:3
+                };
+            }
+
+            if(kec=="Denpasar Utara"){
+                return{
+                    fillColor:"#D99C43",
+                    fillOpacity:0.55,
+                    color:"#111111",
+                    weight:3
+                };
+            }
+
+            if(kec=="Denpasar Timur"){
+                return{
+                    fillColor:"#A56ADF",
+                    fillOpacity:0.55,
+                    color:"#111111",
+                    weight:3
+                };
+            }
+
+            if(kec=="Denpasar Selatan"){
+                return{
+                    fillColor:"#71D4C4",
+                    fillOpacity:0.55,
+                    color:"#111111",
+                    weight:3
+                };
+            }
+
+            return{
+                fillColor:"#cccccc",
+                fillOpacity:0.3,
+                color:"#111111",
+                weight:2
+            };
         }
+
     }
 ).addTo(map);
 
