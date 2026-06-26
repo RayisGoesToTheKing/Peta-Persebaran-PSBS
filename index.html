@@ -140,16 +140,6 @@ body{
 }
 
 /* MOBILE */
-    .locate-btn{
-    background:white;
-    border:none;
-    padding:8px 12px;
-    border-radius:8px;
-    cursor:pointer;
-    box-shadow:0 2px 8px rgba(0,0,0,.3);
-    font-size:14px;
-    font-weight:bold;
-}
 @media(max-width:768px){
 
     .grid{
@@ -258,10 +248,15 @@ body{
 
             <div class="card">
 
-<h2>Statistik Otomatis</h2>
+                <h2>Jumlah Unit</h2>
 
-<ul id="statistik">
-</ul>
+                <ul>
+                    <li>Denpasar Barat : 7 TPS3R, 1 TPST</li>
+                    <li>Denpasar Utara : 4 TPS3R</li>
+                    <li>Denpasar Timur : 6 TPS3R, 2 TPST</li>
+                    <li>Denpasar Selatan : 7 TPS3R, 1 TPST</li>
+                </ul>
+
                 <br>
 
                 <h2>Sumber Data</h2>
@@ -288,15 +283,13 @@ body{
 
 <script>
 
-// =========================
 // BOTTOM SHEET
-// =========================
-const sheet = document.getElementById('sheet');
+const sheet=document.getElementById('sheet');
 
-sheet.addEventListener('click', function(e){
+sheet.addEventListener('click',function(e){
 
     if(
-        e.target === sheet ||
+        e.target===sheet ||
         e.target.classList.contains('drag-handle') ||
         e.target.classList.contains('drag-text')
     ){
@@ -305,243 +298,102 @@ sheet.addEventListener('click', function(e){
 
 });
 
-
-// =========================
 // MAP
-// =========================
-var map = L.map('map').setView([-8.65,115.22],12);
+var map=L.map('map').setView([-8.65,115.22],12);
 
-
-// =========================
-// BASEMAP
-// =========================
 L.tileLayer(
-    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    {
-        attribution:'© OpenStreetMap'
-    }
-).addTo(map);
+'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+{
+    attribution:'© OpenStreetMap'
+}).addTo(map);
 
-
-// =========================
 // LAYER WILAYAH
-// =========================
 L.geoJson(
-    json_ADMINISTRASIKECAMATAN_AR_1,
-    {
-        style:function(feature){
+json_ADMINISTRASIKECAMATAN_AR_1,
+{
+    style:function(feature){
 
-            switch(String(feature.properties.NAMOBJ)){
+        switch(String(feature.properties.NAMOBJ)){
 
-                case "Denpasar Barat":
-                    return{
-                        color:"#000",
-                        weight:3,
-                        fillColor:"rgba(123,255,0,0.62)",
-                        fillOpacity:0.62
-                    };
+            case "Denpasar Barat":
+                return{
+                    color:"#000",
+                    weight:3,
+                    fillColor:"rgba(123,255,0,0.62)",
+                    fillOpacity:0.62
+                };
 
-                case "Denpasar Selatan":
-                    return{
-                        color:"#000",
-                        weight:3,
-                        fillColor:"rgba(0,227,174,0.51)",
-                        fillOpacity:0.51
-                    };
+            case "Denpasar Selatan":
+                return{
+                    color:"#000",
+                    weight:3,
+                    fillColor:"rgba(0,227,174,0.51)",
+                    fillOpacity:0.51
+                };
 
-                case "Denpasar Timur":
-                    return{
-                        color:"#000",
-                        weight:3,
-                        fillColor:"rgba(112,12,217,0.57)",
-                        fillOpacity:0.57
-                    };
+            case "Denpasar Timur":
+                return{
+                    color:"#000",
+                    weight:3,
+                    fillColor:"rgba(112,12,217,0.57)",
+                    fillOpacity:0.57
+                };
 
-                case "Denpasar Utara":
-                    return{
-                        color:"#000",
-                        weight:3,
-                        fillColor:"rgba(213,122,0,0.67)",
-                        fillOpacity:0.67
-                    };
-            }
-
-            return{
-                color:"#000",
-                weight:2,
-                fillOpacity:0
-            };
+            case "Denpasar Utara":
+                return{
+                    color:"#000",
+                    weight:3,
+                    fillColor:"rgba(213,122,0,0.67)",
+                    fillOpacity:0.67
+                };
         }
+
+        return{
+            color:"#000"
+        };
     }
-).addTo(map);
+}).addTo(map);
 
-
-// =========================
-// HITUNG STATISTIK
-// =========================
-var totalTPS3R = 0;
-var totalTPST = 0;
-
-json_DataPersebaranNew_2.features.forEach(function(f){
-
-    if(
-        !f ||
-        !f.properties ||
-        !f.geometry
-    ){
-        return;
-    }
-
-    if(f.properties.Jenis==="TPS3R")
-        totalTPS3R++;
-
-    if(f.properties.Jenis==="TPST")
-        totalTPST++;
-});
-
-
-// tampilkan statistik
-var statistik = document.getElementById('statistik');
-
-if(statistik){
-
-    statistik.innerHTML =
-
-        '<li><b>Total TPS3R :</b> '
-        + totalTPS3R +
-        '</li><br>' +
-
-        '<li><b>Total TPST :</b> '
-        + totalTPST +
-        '</li><br>' +
-
-        '<li><b>Total Keseluruhan :</b> '
-        + (totalTPS3R+totalTPST) +
-        '</li>';
-}
-
-
-// =========================
 // LAYER TITIK
-// =========================
-if(typeof json_DataPersebaranNew_2 !== 'undefined'){
-
 L.geoJson(
-    json_DataPersebaranNew_2,
-    {
-        filter:function(feature){
-            return feature &&
-                   feature.geometry &&
-                   feature.geometry.type==="Point";
-        },
+json_DataPersebaranNew_2,
+{
+    pointToLayer:function(feature,latlng){
 
-        pointToLayer:function(feature,latlng){
+        var color=
+        feature.properties.Jenis==="TPS3R"
+        ?"rgba(13,0,229,1)"
+        :"rgba(226,11,0,1)";
 
-            var color =
-                feature.properties.Jenis==="TPS3R"
-                ? "#0000ff"
-                : "#ff0000";
-
-            return L.circleMarker(latlng,{
-                radius:7,
+        return L.circleMarker(
+            latlng,
+            {
+                radius:6,
                 fillColor:color,
                 color:"#000",
-                weight:1,
-                fillOpacity:0.85
-            });
-        },
-
-        onEachFeature:function(feature,layer){
-
-            var popup =
-                "<b>"+(feature.properties.Nama||"-")+"</b><br>"+
-                "Jenis: "+(feature.properties.Jenis||"-")+"<br>";
-
-            if(feature.properties.Link_Gmaps){
-                popup +=
-                "<a target='_blank' href='"+
-                feature.properties.Link_Gmaps.trim()+
-                "'>Buka Google Maps</a>";
+                fillOpacity:0.8
             }
+        );
+    },
 
-            layer.bindPopup(popup);
+    onEachFeature:function(feature,layer){
+
+        if(feature.properties){
+
+            layer.bindPopup(
+                "<b>"+feature.properties.Nama+"</b><br>"+
+                "Jenis: "+
+                feature.properties.Jenis+
+                "<br><br>"+
+                "<a href='"+
+                feature.properties.Link_Gmaps+
+                "' target='_blank'>Buka di Google Maps</a>"
+            );
         }
     }
-).addTo(map);
-
-}
-    {
-
-        filter:function(feature){
-
-            return(
-                feature &&
-                feature.geometry &&
-                feature.geometry.type==="Point" &&
-                feature.properties &&
-                feature.properties.Jenis
-            );
-        },
-
-        pointToLayer:function(feature,latlng){
-
-            var color =
-                feature.properties.Jenis==="TPS3R"
-                ? "rgba(13,0,229,1)"
-                : "rgba(226,11,0,1)";
-
-            return L.circleMarker(
-                latlng,
-                {
-                    radius:7,
-                    fillColor:color,
-                    color:"#000",
-                    weight:1,
-                    fillOpacity:0.85
-                }
-            );
-        },
-
-        onEachFeature:function(feature,layer){
-
-            var popup =
-
-                '<div style="min-width:220px;">'+
-
-                '<h3 style="margin-bottom:8px;">'+
-                (feature.properties.Nama||'-')+
-                '</h3>'+
-
-                '<hr>'+
-
-                '<b>♻ Jenis:</b><br>'+
-                (feature.properties.Jenis||'-')+
-
-                '<br><br>'+
-
-                '<b>📍 Koordinat:</b><br>'+
-                feature.properties.Latitude+
-                ', '+
-                feature.properties.Longitude+
-
-                '<br><br>';
-
-            if(feature.properties.Link_Gmaps){
-
-                popup +=
-                    '<a href="'+
-                    feature.properties.Link_Gmaps+
-                    '" target="_blank">'+
-                    '🗺 Buka Google Maps'+
-                    '</a>';
-            }
-
-            popup += '</div>';
-
-            layer.bindPopup(popup);
-        }
-
-    }
-).addTo(map);
+}).addTo(map);
 
 </script>
+
+</body>
+</html>
