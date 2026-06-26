@@ -25,7 +25,7 @@
         <div class="drag-handle"></div>
         <h1>Keterangan Peta</h1>
         <img src="Peta Persebaran TPS3R & TPST.jpeg" alt="Legenda">
-        <p>Klik untuk memperbesar. Data TPS3R dan TPST Denpasar.</p>
+        <p>Data TPS3R dan TPST Denpasar.</p>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -36,15 +36,19 @@
         var map = L.map('map').setView([-8.65, 115.22], 12);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
 
-        // Menambahkan Layer Wilayah
+        // Menampilkan Layer Wilayah dengan Warna
         L.geoJson(json_ADMINISTRASIKECAMATAN_AR_1, {
-            style: { color: "#333", weight: 2, fillOpacity: 0.2 }
+            style: {
+                color: "#3388ff",      // Warna garis batas
+                weight: 2,             // Ketebalan garis
+                fillColor: "#3388ff",  // Warna isi wilayah
+                fillOpacity: 0.4       // Transparansi (0.4 berarti cukup terlihat)
+            }
         }).addTo(map);
 
-        // Menambahkan Layer Titik
+        // Menampilkan Layer Titik
         L.geoJson(json_DataPersebaranNew_2, {
             pointToLayer: function (feature, latlng) {
-                // Hanya buat titik jika geometry tidak null
                 if (feature.geometry) {
                     var color = (feature.properties.Jenis === "TPS3R") ? "blue" : "red";
                     return L.circleMarker(latlng, { radius: 6, fillColor: color, color: "#000", fillOpacity: 0.8 });
